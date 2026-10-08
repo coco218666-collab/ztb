@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>青晟中学侦探部 - ARG</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+body{display:flex;justify-content:center;align-items:center;min-height:100vh;background:#eef2f6;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;padding:12px;overflow:hidden}
+
+.iphone-screen{
+    width:393px;height:852px;
+    background:radial-gradient(circle at 100% 0%,#fcd1a1 0%,transparent 45%),
+               radial-gradient(circle at 0% 100%,#c2e9fb 0%,transparent 60%),
+               linear-gradient(160deg,#f6b4b8 0%,#e2c3ca 25%,#a1c4fd 50%,#8ec5fc 75%,#e0f2fe 100%);
+    border-radius:48px;overflow:hidden;position:relative;
+    box-shadow:0 15px 40px rgba(0,0,0,.15),inset 0 0 10px rgba(255,255,255,.5);
+    display:flex;flex-direction:column;
+    flex-shrink:0;
+}
+
+.dynamic-island{
+    position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    width:120px;height:35px;background:#000;border-radius:20px;z-index:3000;
+    transition:width .35s cubic-bezier(.2,.9,.3,1);
+}
+.dynamic-island.wide{width:210px}
+
+.status-bar{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 28px 0;color:#fff;font-size:15px;font-weight:600;
+    text-shadow:0 1px 3px rgba(0,0,0,.25);z-index:2500;pointer-events:none;
+}
+.status-right{display:flex;align-items:center;gap:6px}
+.battery{width:24px;height:12px;border:1.5px solid rgba(255,255,255,.9);border-radius:4px;position:relative;padding:1.5px}
+.battery::after{content:'';position:absolute;right:-4px;top:3px;width:2px;height:4px;background:rgba(255,255,255,.9);border-radius:0 2px 2px 0}
+.battery-level{width:80%;height:100%;background:#fff;border-radius:2px}
+
+.home-layer{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1),opacity .3s;
+    z-index:10;
+}
+.home-layer.hidden{transform:scale(.92);opacity:0;pointer-events:none}
+
+.task-card{
+    position:absolute;top:64px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.94);backdrop-filter:blur(20px);
+    padding:9px 16px;border-radius:16px;
+    font-size:12px;color:#333;box-shadow:0 4px 16px rgba(0,0,0,.12);
+    z-index:900;max-width:340px;display:flex;align-items:center;gap:7px;
+    pointer-events:none;transition:opacity .3s,transform .3s;
+}
+.task-card::before{content:'📋';font-size:13px}
+.task-card.hidden{opacity:0;transform:translate(-50%,-10px)}
+
+.app-grid{
+    display:grid;
+    grid-template-columns:repeat(4,62px);
+    justify-content:space-between;
+    gap:24px 0;
+    padding:110px 24px 0;
+    position:relative;z-index:10;
+    align-content:start;
+    flex:1;
+}
+.app{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .2s}
+.app:active{transform:scale(.9)}
+.app-icon{
+    width:62px;height:62px;border-radius:14px;
+    display:flex;justify-content:center;align-items:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.15),inset 0 1px 2px rgba(255,255,255,.4);
+    position:relative;overflow:hidden;background:#fff;
+}
+.app-name{margin-top:6px;font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4);font-weight:500;white-space:nowrap}
+.app-badge{
+    position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;
+    background:#fa3f3f;color:#fff;font-size:11px;font-weight:700;
+    border-radius:10px;display:flex;align-items:center;justify-content:center;
+    padding:0 5px;border:2px solid #fff;z-index:5;
+}
+
+.icon-calendar{background:#fff}
+.icon-browser{background:#fff}
+.icon-vv{background:#07c160}
+.icon-wall{background:linear-gradient(135deg,#ff6b9d,#ff4d7d)}
+.icon-bluebao{background:#1677ff}
+.icon-camera{background:#f2f2f7}
+.icon-clock{background:#000}
+.icon-notes{background:#fff}
+.icon-appstore{background:#007aff}
+.icon-settings{background:#8e8e93}
+.icon-photos{background:#fff}
+
+.bottom-area{
+    position:absolute;bottom:0;left:0;width:100%;
+    padding:0 15px 35px;display:flex;flex-direction:column;align-items:center;z-index:10;
+}
+.search-pill{
+    background:rgba(255,255,255,.3);backdrop-filter:blur(10px);
+    padding:6px 16px;border-radius:20px;color:#fff;font-size:14px;
+    margin-bottom:15px;display:flex;align-items:center;gap:5px;
+    text-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.dock{
+    width:100%;background:rgba(255,255,255,.25);
+    backdrop-filter:blur(25px);border-radius:35px;
+    padding:15px 20px;display:flex;justify-content:space-between;align-items:center;
+}
+.dock-icon{
+    width:62px;height:62px;border-radius:14px;
+    display:flex;justify-content:center;align-items:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.15),inset 0 1px 2px rgba(255,255,255,.4);
+    background:#fff;
+}
+.dock-phone{background:#34c759}
+.dock-safari{background:#fff}
+.dock-message{background:#34c759}
+.dock-music{background:#ff3b30}
+
+.home-indicator{
+    width:140px;height:5px;background:#fff;border-radius:5px;
+    position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+    z-index:2400;box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none;
+}
+
+.app-view{
+    position:absolute;inset:0;z-index:500;
+    display:flex;flex-direction:column;
+    background:#f2f2f7;
+    transform:translateY(100%);
+    transition:transform .4s cubic-bezier(.2,.9,.3,1);
+    overflow:hidden;
+}
+.app-view.show{transform:translateY(0)}
+
+.app-top{
+    flex-shrink:0;
+    padding:54px 14px 12px;
+    display:flex;align-items:center;gap:10px;
+    font-size:16px;font-weight:600;color:#fff;
+    background:#3f5d8a;position:relative;z-index:600;
+}
+.app-view[data-app="vv"] .app-top{background:#2a8b48}
+.app-view[data-app="wall"] .app-top{background:linear-gradient(135deg,#ff6b9d,#ff4d7d)}
+.app-view[data-app="bluebao"] .app-top{background:#1677ff}
+.app-back{
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    font-size:22px;line-height:1;cursor:pointer;flex-shrink:0;
+    border-radius:8px;
+}
+.app-back:active{background:rgba(255,255,255,.15)}
+.app-title{flex:1;font-size:16px;font-weight:600;text-align:center}
+.app-action{
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    font-size:16px;cursor:pointer;flex-shrink:0;
+}
+.app-body{
+    flex:1;overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;position:relative;
+}
+.app-body::-webkit-scrollbar{width:0}
+
+.site-nav{
+    display:flex;background:#fdfdfe;border-bottom:2px solid #3f5d8a;
+    overflow-x:auto;flex-shrink:0;position:sticky;top:0;z-index:20;
+}
+.site-nav::-webkit-scrollbar{display:none}
+.site-nav button{
+    flex:0 0 auto;border:0;background:transparent;padding:11px 14px;
+    font-size:12.5px;color:#3f5d8a;cursor:pointer;font-family:inherit;
+    white-space:nowrap;
+}
+.site-nav button.on{background:#3f5d8a;color:#fff}
+.site-body{padding:18px 18px 80px;font-size:14px;line-height:1.85;color:#1d2027;background:#fff;min-height:100%}
+.site-body h1{font-size:19px;margin:0 0 4px}
+.site-body h2{font-size:17px;border-left:4px solid #3f5d8a;padding-left:9px;margin:0 0 12px}
+.site-body h3{font-size:14px;color:#3f5d8a;margin:16px 0 6px}
+.site-body p{margin:7px 0}
+.sm{font-size:12px;color:#8b909a;line-height:1.65}
+hr{border:0;border-top:1px solid #e8e8ee;margin:12px 0}
+
+.post{border:1px solid #e2e2e9;background:#fdfdff;padding:13px;border-radius:8px;margin:10px 0}
+.post-head{display:flex;gap:11px;align-items:flex-start}
+.post-title{font-weight:600;font-size:14px}
+.post-meta{font-size:11.5px;color:#9a9aa6;margin-top:2px}
+.post-body{color:#6a6a78;font-size:13px;margin-top:8px;line-height:1.7}
+.reply{background:#f5f5f8;border-left:3px solid #d6d6de;padding:8px 11px;margin-top:7px;font-size:13px;border-radius:0 5px 5px 0}
+.reply .t{float:right;color:#b2b2bc;font-size:11px}
+
+.btn{
+    font-family:inherit;font-size:13.5px;padding:9px 15px;border:1px solid #c3ccda;
+    background:#f6f8fc;color:#33507a;border-radius:7px;cursor:pointer;margin:4px 6px 4px 0;
+    transition:.14s;
+}
+.btn:active{background:#e6ecf6}
+.btn.primary{background:#3f5d8a;color:#fff;border-color:#3f5d8a}
+.btn.primary:active{background:#34507a}
+.btn.wide{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;line-height:1.55}
+.btn.done{opacity:.55;border-style:dashed}
+
+.av{
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;font-weight:600;background-size:cover;background-position:center;
+    overflow:hidden;
+}
+.av.sq{border-radius:10px}
+
+.vv-wrap{min-height:100%;background:#f2f2f7;display:flex;flex-direction:column;padding-bottom:60px}
+.vv-list{background:#fff;flex:1}
+.chat-item{
+    display:flex;gap:12px;padding:12px 15px;align-items:center;cursor:pointer;
+    border-bottom:1px solid #f3f3f6;transition:.1s;background:#fff;
+}
+.chat-item:active{background:#f4f4f8}
+.chat-item .meta{flex:1;min-width:0}
+.chat-item .nm{font-size:14.5px;font-weight:500;color:#15171c}
+.chat-item .pv{font-size:12.5px;color:#9a9aa6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.chat-item .rt{font-size:11px;color:#b4b4be;flex:0 0 auto;align-self:flex-start;padding-top:3px}
+
+.vv-tabs{
+    position:sticky;bottom:0;left:0;right:0;display:flex;
+    background:rgba(250,250,252,.96);
+    border-top:1px solid #e2e2e8;z-index:50;backdrop-filter:blur(16px);
+    flex-shrink:0;
+}
+.vv-tabs .tb{
+    flex:1;text-align:center;padding:9px 0 12px;font-size:10.5px;color:#8b909a;
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.vv-tabs .tb .ti{font-size:19px;line-height:1}
+.vv-tabs .tb.on{color:#2a8b48}
+
+.msgs{padding:14px 12px 40px;background:#f2f2f7;flex:1;display:flex;flex-direction:column;gap:11px;min-height:100%}
+.msg{display:flex;gap:9px;align-items:flex-start}
+.msg.me{flex-direction:row-reverse}
+.msg .body{max-width:73%;display:flex;flex-direction:column;gap:4px}
+.msg.me .body{align-items:flex-end}
+.msg .who{font-size:11px;color:#9a9aa6;padding-left:3px}
+.bub{padding:9px 12px;border-radius:9px;font-size:14px;line-height:1.55;word-break:break-word;background:#fff;color:#15171c}
+.msg.me .bub{background:#95ec69}
+.bub.transfer{background:#f7a83a;color:#fff;font-weight:500}
+.bub.transfer .sub{font-size:11.5px;opacity:.92;font-weight:400;display:block;margin-top:3px}
+.sysline{text-align:center;font-size:11.5px;color:#a0a0ac;padding:3px 0}
+.sysline.red{color:#d05a5a}
+.msg-img{
+    width:158px;border-radius:9px;overflow:hidden;background:#dcdfe5;
+    cursor:pointer;border:1px solid #d0d3da;
+}
+.msg-img .cap{background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:4px 8px;text-align:center}
+
+.imgslot{
+    width:100%;aspect-ratio:4/3;background:#dfe3ea;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;
+    color:#8a90a0;font-size:12px;position:relative;overflow:hidden;
+}
+.imgslot img{width:100%;height:100%;object-fit:cover;display:block}
+.imgslot .ph{text-align:center;line-height:1.7}
+
+.searchbar{
+    display:flex;align-items:center;gap:8px;margin:12px 14px;background:#e6e6ec;
+    border-radius:10px;padding:9px 12px;
+}
+.searchbar input{
+    flex:1;border:0;background:transparent;outline:0;font-size:14px;
+    font-family:inherit;color:#15171c;
+}
+.sres{padding:0 14px 30px}
+.sres .row{padding:11px 0;border-bottom:1px solid #ececf0;cursor:pointer}
+.sres .row .rn{font-size:12px;color:#2a8b48;font-weight:600}
+.sres .row .rt{font-size:13.5px;color:#333;margin-top:3px;line-height:1.5}
+.sres .row .rr{font-size:11px;color:#b2b2bc;margin-top:3px}
+.empty{text-align:center;color:#a8a8b2;font-size:13px;padding:44px 20px;line-height:1.9}
+
+.contact-item{
+    display:flex;gap:12px;padding:10px 15px;align-items:center;cursor:pointer;
+    background:#fff;border-bottom:1px solid #f3f3f6;transition:.1s;
+}
+.contact-item:active{background:#f4f4f8}
+.contact-item .nm{font-size:14.5px;color:#15171c;font-weight:450}
+.contact-item .cl{font-size:11.5px;color:#9a9aa6;margin-top:2px}
+.contact-item .tag{
+    font-size:10px;color:#2a8b48;background:#e6f5ec;border-radius:4px;
+    padding:1px 5px;margin-left:6px;
+}
+.cg-title{font-size:11.5px;color:#8b909a;padding:12px 16px 6px}
+
+.cd-wrap{min-height:100%;background:#f2f2f7}
+.cd-hero{
+    background:#fff;padding:26px 18px 20px;display:flex;flex-direction:column;
+    align-items:center;gap:10px;border-bottom:1px solid #e8e8ee;
+}
+.cd-hero .nm{font-size:19px;font-weight:600;color:#15171c}
+.cd-hero .cl{font-size:12.5px;color:#8b909a}
+.cd-actions{padding:16px}
+.cd-actions .btn{width:100%;text-align:center;display:block;margin:8px 0;padding:12px}
+.cd-note{padding:0 18px 30px;font-size:12px;color:#9a9aa6;line-height:1.8}
+
+#dialog{
+    position:absolute;left:0;right:0;bottom:0;z-index:2200;
+    background:rgba(15,17,23,.97);color:#eef1f6;
+    padding:20px 22px 30px;border-radius:22px 22px 0 0;
+    transform:translateY(130%);
+    transition:transform .35s cubic-bezier(.2,.9,.3,1);
+    cursor:pointer;box-shadow:0 -8px 36px rgba(0,0,0,.5);
+    max-height:70%;overflow-y:auto;
+}
+#dialog.show{transform:translateY(0)}
+.dlg-row{display:flex;gap:11px;align-items:flex-start}
+.dlg-body{flex:1;min-width:0}
+.dlg-name{font-size:12px;font-weight:700;margin-bottom:5px}
+.dlg-text{font-size:15px;line-height:1.72;white-space:pre-wrap}
+.dlg-os{
+    font-size:14.5px;line-height:1.78;color:#8fd6c6;font-style:italic;
+    border-left:2px solid #3f6b62;padding-left:12px;
+}
+.dlg-tap{text-align:right;font-size:11px;color:#5d6472;margin-top:10px}
+
+#modal{
+    position:absolute;inset:0;background:rgba(0,0,0,.62);z-index:2800;
+    display:none;align-items:center;justify-content:center;padding:18px;
+}
+#modal.show{display:flex}
+.modal-box{
+    background:#fff;width:100%;max-width:340px;max-height:82vh;overflow-y:auto;
+    border-radius:16px;padding:16px;box-shadow:0 26px 80px rgba(0,0,0,.5);
+}
+.modal-box h3{font-size:16px;margin:0 0 10px;color:#15171c}
+.modal-box .sm{font-size:12px;color:#8b909a;line-height:1.75}
+
+.banner{
+    position:absolute;top:58px;left:14px;right:14px;z-index:2600;
+    background:rgba(255,255,255,.98);border-radius:16px;padding:12px 14px;
+    display:flex;gap:11px;align-items:center;
+    box-shadow:0 10px 32px rgba(0,0,0,.28);
+    transform:translateY(-220%);
+    transition:transform .48s cubic-bezier(.2,.9,.3,1.16);
+    backdrop-filter:blur(14px);
+}
+.banner.show{transform:translateY(0)}
+.banner .bi{
+    width:40px;height:40px;border-radius:11px;background:#1677ff;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto;
+}
+.banner .bt{font-size:12.5px;font-weight:700;color:#15171c}
+.banner .bd{font-size:12px;color:#5a5f6b;margin-top:2px}
+
+/* 座位表 */
+.seatwrap{
+    display:flex;gap:7px;margin:12px 0;background:#f7f8fa;
+    border:1px solid #e0e2e8;padding:10px;border-radius:9px;
+}
+.collabel{
+    writing-mode:vertical-rl;text-orientation:upright;font-size:11px;
+    display:flex;align-items:center;justify-content:center;padding:4px 3px;border-radius:5px;
+}
+.collabel.win{background:#d6e8f8;color:#3f6790}
+.collabel.aisle{background:#f3e2d6;color:#8a5c3a}
+.seatrows{flex:1;display:flex;flex-direction:column;gap:5px}
+.srow{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.sseat{
+    background:#fff;border:1px solid #dfe2e8;border-radius:5px;
+    padding:7px 1px;text-align:center;font-size:10.5px;color:#333;
+    transition:.14s;
+}
+.sseat[data-act]{cursor:pointer}
+.sseat[data-act]:active{background:#eef4ff;border-color:#9ab8e0;transform:scale(.96)}
+.sseat.me{background:#d9ecff;border-color:#8ab4e8}
+.sseat.podium{grid-column:1/-1;background:#eef1f6;font-weight:600;color:#5a6478;padding:6px 0;margin-bottom:3px}
+
+/* 推断按钮 */
+.guess{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    border:1px solid #dfe2e8;background:#fafbfd;border-radius:8px;
+    padding:11px 13px;margin:8px 0;cursor:pointer;font-size:13.5px;color:#333;
+    transition:.14s;
+}
+.guess:active{background:#eef4ff}
+.guess.on{border-color:#3f5d8a;background:#eef4ff;color:#2b4a76;font-weight:600}
+.guess .gk{font-weight:600;color:#3f5d8a;flex:0 0 auto}
+.guess .gv{text-align:right;font-size:12.5px;line-height:1.5}
+.guess.on .gv{color:#2b4a76}
+
+/* 提问选项 */
+.qask{
+    display:flex;align-items:flex-start;gap:10px;
+    border:1px solid #dfe2e8;background:#fafbfd;border-radius:9px;
+    padding:12px 13px;margin:9px 0;cursor:pointer;font-size:13.5px;color:#2b3440;
+    line-height:1.5;transition:.14s;
+}
+.qask:active{background:#eef4ff}
+.qask.done{border-color:#9dc6a8;background:#f2faf4;color:#3d6b4a}
+.qask .qi{
+    flex:0 0 auto;width:20px;height:20px;border-radius:50%;
+    background:#e3e8f0;color:#5a6a82;font-size:11px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.qask.done .qi{background:#6cbf85;color:#fff}
+
+#toast{
+    position:absolute;left:50%;bottom:100px;transform:translate(-50%,20px);
+    background:rgba(22,24,30,.94);color:#eaf0ff;font-size:12.5px;
+    padding:10px 17px;border-radius:22px;z-index:2900;
+    opacity:0;transition:.3s;pointer-events:none;
+    max-width:86%;text-align:center;line-height:1.5;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-height:900px){
+    .iphone-screen{height:96vh;max-height:852px}
+}
+</style>
+</head>
+<body>
+
+<div class="iphone-screen">
+    <div class="dynamic-island" id="island"></div>
+
+    <div class="status-bar">
+        <div class="time" id="statusTime">21:47</div>
+        <div class="status-right">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="white">
+                <rect x="0" y="8" width="3" height="4" rx="1"/>
+                <rect x="5" y="5" width="3" height="7" rx="1"/>
+                <rect x="10" y="2" width="3" height="10" rx="1"/>
+                <rect x="15" y="0" width="3" height="12" rx="1"/>
+            </svg>
+            <span>5G</span>
+            <div class="battery"><div class="battery-level"></div></div>
+        </div>
+    </div>
+
+    <div class="home-layer" id="homeLayer">
+        <div class="task-card" id="taskCard">
+            <span id="taskText">打开浏览器，查看侦探部委托板</span>
+        </div>
+
+        <div class="app-grid">
+            <div class="app" data-act="openApp" data-app="browser">
+                <div class="app-icon icon-browser">
+                    <svg width="42" height="42" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="18" fill="#f2f2f7"/>
+                        <circle cx="20" cy="20" r="16" fill="#007aff"/>
+                        <circle cx="20" cy="20" r="12" fill="#fff"/>
+                        <path d="M20 8 L24 20 L20 32 L16 20 Z" fill="#ff3b30"/>
+                        <path d="M8 20 L20 16 L32 20 L20 24 Z" fill="#007aff"/>
+                        <circle cx="20" cy="20" r="2" fill="#fff"/>
+                    </svg>
+                </div>
+                <div class="app-name">浏览器</div>
+            </div>
+
+            <div class="app" data-act="openApp" data-app="vv">
+                <div class="app-icon icon-vv">
+                    <svg width="38" height="38" viewBox="0 0 36 36">
+                        <path d="M18 6 C10 6 4 11 4 17 C4 21 7 24 11 25 L10 29 L14 26 C15 26 16 27 18 27 C26 27 32 22 32 17 C32 11 26 6 18 6 Z" fill="#fff"/>
+                        <path d="M26 16 C22 16 19 18 19 21 C19 23 21 25 23 25 L22 28 L25 26 C26 26 27 27 28 27 C31 27 33 25 33 21 C33 18 30 16 26 16 Z" fill="#fff"/>
+                        <circle cx="12" cy="15" r="1.5" fill="#07c160"/>
+                        <circle cx="22" cy="15" r="1.5" fill="#07c160"/>
+                        <circle cx="24" cy="20" r="1" fill="#07c160"/>
+                        <circle cx="28" cy="20" r="1" fill="#07c160"/>
+                    </svg>
+                </div>
+                <div class="app-name">VV</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-wall">
+                    <svg width="38" height="38" viewBox="0 0 36 36">
+                        <rect x="6" y="10" width="24" height="18" rx="3" fill="#fff"/>
+                        <rect x="9" y="14" width="18" height="3" rx="1" fill="#ff6b9d"/>
+                        <rect x="9" y="19" width="14" height="3" rx="1" fill="#ffd1dc"/>
+                        <circle cx="25" cy="24" r="2" fill="#ff6b9d"/>
+                    </svg>
+                </div>
+                <div class="app-name">校园墙</div>
+            </div>
+
+            <div class="app" data-act="openApp" data-app="bluebao">
+                <div class="app-icon icon-bluebao">
+                    <svg width="38" height="38" viewBox="0 0 36 36">
+                        <path d="M12 6 L24 6 C28 6 30 8 30 12 L30 24 C30 28 28 30 24 30 L12 30 C8 30 6 28 6 24 L6 12 C6 8 8 6 12 6 Z" fill="#1677ff"/>
+                        <text x="18" y="25" font-size="20" font-weight="bold" fill="#fff" text-anchor="middle" font-family="sans-serif">宝</text>
+                    </svg>
+                </div>
+                <div class="app-name">蓝宝</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-calendar" id="calendarIcon"></div>
+                <div class="app-name">日历</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-photos">
+                    <svg width="42" height="42" viewBox="0 0 40 40">
+                        <g transform="translate(20,20)">
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#ff3b30"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#ff9500" transform="rotate(45)"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#ffcc00" transform="rotate(90)"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#34c759" transform="rotate(135)"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#5ac8fa" transform="rotate(180)"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#007aff" transform="rotate(225)"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#af52de" transform="rotate(270)"/>
+                            <ellipse cx="0" cy="-8" rx="4" ry="9" fill="#ff2d55" transform="rotate(315)"/>
+                            <circle cx="0" cy="0" r="5" fill="rgba(255,255,255,0.8)"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="app-name">照片</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-camera">
+                    <svg width="34" height="34" viewBox="0 0 32 32">
+                        <rect x="4" y="8" width="24" height="18" rx="4" fill="#333"/>
+                        <path d="M12 8 L14 5 L18 5 L20 8 Z" fill="#333"/>
+                        <circle cx="16" cy="17" r="6" fill="#555"/>
+                        <circle cx="16" cy="17" r="4" fill="#111"/>
+                        <circle cx="16" cy="17" r="2" fill="#4fa4f7"/>
+                        <circle cx="8" cy="12" r="1.5" fill="#fff"/>
+                    </svg>
+                </div>
+                <div class="app-name">相机</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-clock">
+                    <svg width="42" height="42" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="18" fill="#fff"/>
+                        <line x1="20" y1="20" x2="20" y2="10" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="20" y1="20" x2="26" y2="20" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="20" cy="20" r="2" fill="#ff3b30"/>
+                    </svg>
+                </div>
+                <div class="app-name">时钟</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-notes">
+                    <svg width="42" height="42" viewBox="0 0 40 40">
+                        <rect x="6" y="4" width="28" height="32" rx="4" fill="#fff" stroke="#e5e5ea" stroke-width="1"/>
+                        <rect x="6" y="4" width="28" height="8" rx="4" fill="#ffcc00"/>
+                        <line x1="10" y1="18" x2="30" y2="18" stroke="#e5e5ea" stroke-width="2"/>
+                        <line x1="10" y1="24" x2="30" y2="24" stroke="#e5e5ea" stroke-width="2"/>
+                        <line x1="10" y1="30" x2="22" y2="30" stroke="#e5e5ea" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="app-name">备忘录</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-appstore">
+                    <svg width="38" height="38" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="14" fill="#007aff"/>
+                        <path d="M18 8 L24 24 L12 24 Z" fill="#fff"/>
+                        <path d="M18 12 L22 22 L14 22 Z" fill="#007aff"/>
+                        <circle cx="18" cy="18" r="2" fill="#fff"/>
+                    </svg>
+                </div>
+                <div class="app-name">App Store</div>
+            </div>
+
+            <div class="app" data-act="disabledApp">
+                <div class="app-icon icon-settings">
+                    <svg width="38" height="38" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="16" fill="#8e8e93"/>
+                        <circle cx="18" cy="18" r="8" fill="#fff"/>
+                        <circle cx="18" cy="18" r="4" fill="#8e8e93"/>
+                        <rect x="15" y="2" width="6" height="8" rx="2" fill="#fff"/>
+                        <rect x="15" y="26" width="6" height="8" rx="2" fill="#fff"/>
+                        <rect x="2" y="15" width="8" height="6" rx="2" fill="#fff"/>
+                        <rect x="26" y="15" width="8" height="6" rx="2" fill="#fff"/>
+                    </svg>
+                </div>
+                <div class="app-name">设置</div>
+            </div>
+        </div>
+
+        <div class="bottom-area">
+            <div class="search-pill" data-act="disabledApp">🔍 搜索</div>
+            <div class="dock">
+                <div class="dock-icon dock-phone" data-act="disabledApp">
+                    <svg width="34" height="34" viewBox="0 0 32 32"><path d="M8 4 C6 4 4 6 4 8 C4 18 14 28 24 28 C26 28 28 26 28 24 L24 18 L20 20 C16 18 14 16 12 12 L14 8 L8 4 Z" fill="#fff"/></svg>
+                </div>
+                <div class="dock-icon dock-safari" data-act="openApp" data-app="browser">
+                    <svg width="34" height="34" viewBox="0 0 32 32">
+                        <circle cx="16" cy="16" r="14" fill="#007aff"/>
+                        <circle cx="16" cy="16" r="10" fill="#fff"/>
+                        <path d="M16 6 L19 16 L16 26 L13 16 Z" fill="#ff3b30"/>
+                        <path d="M6 16 L16 13 L26 16 L16 19 Z" fill="#007aff"/>
+                    </svg>
+                </div>
+                <div class="dock-icon dock-message" data-act="openApp" data-app="vv">
+                    <svg width="34" height="34" viewBox="0 0 32 32">
+                        <path d="M16 6 C9 6 4 10 4 15 C4 18 7 21 10 22 L9 26 L14 23 C15 23 15 23 16 23 C23 23 28 19 28 15 C28 10 23 6 16 6 Z" fill="#fff"/>
+                        <circle cx="11" cy="14" r="1.5" fill="#34c759"/>
+                        <circle cx="16" cy="14" r="1.5" fill="#34c759"/>
+                        <circle cx="21" cy="14" r="1.5" fill="#34c759"/>
+                    </svg>
+                </div>
+                <div class="dock-icon dock-music" data-act="disabledApp">
+                    <svg width="34" height="34" viewBox="0 0 32 32"><path d="M12 6 L12 22 C12 24 9 26 7 26 C5 26 4 25 4 23 C4 21 6 19 9 19 L10 19 L10 10 L22 8 L22 20 C22 22 19 24 17 24 C15 24 14 23 14 21 C14 19 16 17 19 17 L20 17 L20 6 Z" fill="#fff"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-view" id="appView">
+        <div class="app-top">
+            <div class="app-back" data-act="closeApp">‹</div>
+            <div class="app-title" id="appTitle">标题</div>
+            <div class="app-action" id="appAction"></div>
+        </div>
+        <div class="app-body" id="appBody"></div>
+    </div>
+
+    <div class="home-indicator"></div>
+
+    <div id="dialog"></div>
+    <div id="modal"></div>
+
+    <div class="banner" id="banner">
+        <div class="bi" id="bannerIcon">💙</div>
+        <div>
+            <div class="bt" id="bannerTitle">蓝宝</div>
+            <div class="bd" id="bannerText">到账通知</div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+</div>
+
+<script>
+/* =========================================================
+   一、图片槽位
+========================================================= */
+const IMG = {
+    seatmap: '',
+    aimeng_shot: '',
+    wall_photo: '',
+};
+const AVATAR_IMG = {
+    li: '', shi: '', meng: '', ai: '', dai: '', jiao: '',
+};
+
+/* =========================================================
+   二、基础数据
+========================================================= */
+const AV = {
+    li:  {ch:'李', bg:'#cfe3f5', fg:'#3a5a8c'},
+    shi: {ch:'施', bg:'#dad6ce', fg:'#555a63'},
+    meng:{ch:'蒙', bg:'#f7d9a4', fg:'#8a5a10'},
+    ai:  {ch:'❤', bg:'#f9d2da', fg:'#c94a6a'},
+    dai: {ch:'戴', bg:'#f4c4dc', fg:'#a03a70'},
+    jiao:{ch:'焦', bg:'#cbe0cb', fg:'#3a6a3a'},
+    _:   {ch:'?', bg:'#e4e4ea', fg:'#8a8a96'},
+};
+function avHTML(key, size, square){
+    const a = AV[key] || AV._;
+    const src = AVATAR_IMG[key] || '';
+    const style = [
+        'width:'+size+'px','height:'+size+'px',
+        'font-size:'+Math.round(size*0.42)+'px',
+        src ? 'background-image:url('+src+')' : 'background:'+a.bg,
+        src ? '' : 'color:'+a.fg,
+    ].filter(Boolean).join(';');
+    return '<div class="av'+(square?' sq':'')+'" style="'+style+'">'+(src?'':a.ch)+'</div>';
+}
+
+const CONTACTS = {
+    ai:   {name:'艾梦',   av:'ai',   cls:'高一一班',        tag:'委托者'},
+    shi:  {name:'施御杉', av:'shi',  cls:'高一二班',        tag:'侦探部社长'},
+    li:   {name:'李真柯', av:'li',   cls:'高一二班',        tag:'我', self:true},
+    jiao: {name:'焦芭纳', av:'jiao', cls:'高一二班 班主任', tag:'群主'},
+    meng: {name:'蒙欢',   av:'meng', cls:'高一二班',        tag:''},
+    dai:  {name:'戴梓挚', av:'dai',  cls:'高一二班',        tag:''},
+};
+
+const BANANA_MEMBERS = [
+    {id:'jiao', name:'焦芭纳', role:'班主任'},
+    {id:'li',   name:'李真柯', role:''},
+    {id:'shi',  name:'施御杉', role:''},
+    {id:'meng', name:'蒙欢',   role:''},
+    {id:'dai',  name:'戴梓挚', role:''},
+    {id:'g1',  name:'周舟',   role:''},
+    {id:'g2',  name:'林小满', role:''},
+    {id:'g3',  name:'何嘉',   role:''},
+    {id:'g4',  name:'徐一鸣', role:''},
+    {id:'g5',  name:'赵佳',   role:''},
+    {id:'g6',  name:'王凯',   role:''},
+    {id:'g7',  name:'陈知遥', role:''},
+    {id:'g8',  name:'孙睿',   role:''},
+    {id:'g9',  name:'吴桐',   role:''},
+    {id:'g10', name:'周未',   role:''},
+];
+
+const SEATS = [
+    ['王越',   '温凯',   '卢望韦', '姚悦戈', '郝甜甜'],
+    ['陈鱼',   '罗燕',   '张明志', '尤倩',   '蒙欢'],
+    ['吴之羽', '余庭轩', '袁深',   '钟离',   '戴梓挚'],
+    ['李真柯', '万芊佰', '齐冬',   '向小文', '李斯瑟'],
+    ['施御杉', '唐佳豪', '许嘉欣', '韩黄',   '梁一凡'],
+];
+
+const CHATS = {
+    banana: {
+        name:'香蕉园', av:'jiao', type:'group', sub:'高一二班（43）',
+        msgs:[
+            {who:'jiao', type:'text', text:'各位同学，新学期座位表，请查收。', time:'09-01 07:50'},
+            {who:'jiao', type:'img',  img:'seatmap', cap:'座位表.jpg', time:'09-01 07:50'},
+            {who:'jiao', type:'text', text:'教室空调坏了，维修师傅说这周来。', time:'09-01 08:05'},
+            {who:'jiao', type:'text', text:'这几天上海还是高温，体育课改到室内。', time:'09-01 08:06'},
+        ],
+    },
+    ai: {
+        name:'艾梦', av:'ai', type:'single', sub:'',
+        msgs:[
+            {who:'ai', type:'text', text:'小真柯，是我。', time:'09-02 21:20'},
+            {who:'ai', type:'text', text:'委托板上那个匿名帖是我发的。', time:'09-02 21:21'},
+            {who:'li', type:'text', text:'嗯，我们接下了。', time:'09-02 21:24'},
+            {who:'ai', type:'text', text:'谢谢你。真的。', time:'09-02 21:24'},
+            {who:'ai', type:'text', text:'我昨天翻了他的手机。', time:'09-02 21:28'},
+            {who:'ai', type:'text', text:'拍了几张，你自己看吧。', time:'09-02 21:29'},
+            {who:'ai', type:'img',  img:'aimeng_shot', cap:'IMG_0921.png', time:'09-02 21:29'},
+            {who:'ai', type:'text', text:'他对着好多人都这样说话。', time:'09-02 21:31'},
+            {who:'ai', type:'text', text:'可我每次问他，他都说我想多了。', time:'09-02 21:31'},
+        ],
+    },
+    shi: {
+        name:'施御杉', av:'shi', type:'single', sub:'',
+        msgs:[
+            {who:'shi', type:'text', text:'后台跑完了。', time:'09-02 23:10'},
+            {who:'shi', type:'text', text:'发帖人确实是艾梦，高一一班。', time:'09-02 23:10'},
+            {who:'shi', type:'text', text:'别急着下结论。', time:'09-02 23:11'},
+            {who:'li',  type:'text', text:'好。', time:'09-02 23:12'},
+        ],
+    },
+};
+
+/* =========================================================
+   三、游戏状态
+========================================================= */
+const G = {
+    task: 0,
+    layer: 'home',
+    app: null,
+    browserTab: 'home',
+    vvTab: 'chat',
+    vvChat: null,
+    vvContact: null,
+    vvInGroup: false,
+    playerEnding: null,
+    endings: {},
+    unlockedChats: {banana:true, ai:true, shi:true},
+    dialogQueue: [],
+    dialogEnd: null,
+    guess: {sex:false, name:false, status:false},
+    asked: {f1:false, f2:false, f3:false},
+    modalLock: false,
+};
+
+const TASKS = [
+    '打开浏览器，查看侦探部委托板',
+    '点击委托帖，推测委托人的特征',
+    '放学了。前往老教学楼601',
+    '向艾梦提问，了解委托细节',
+    '打开VV，在香蕉园群里找到座位表',
+    '在座位表上确认「双马尾」是谁',
+    '去问问戴梓挚',
+    '查看艾梦发来的聊天截图',
+    '提交你的最终结论',
+    '案件已结案',
+];
+
+/* =========================================================
+   四、工具
+========================================================= */
+let toastTimer;
+function toast(t){
+    const el = document.getElementById('toast');
+    el.textContent = t;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+let bannerTimer;
+function showBanner(title, text, icon){
+    document.getElementById('bannerIcon').textContent = icon || '💙';
+    document.getElementById('bannerTitle').textContent = title;
+    document.getElementById('bannerText').textContent = text;
+    const b = document.getElementById('banner');
+    b.classList.add('show');
+    clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(()=>b.classList.remove('show'), 5600);
+}
+
+let islandTimer;
+function expandIsland(){
+    const i = document.getElementById('island');
+    i.classList.add('wide');
+    clearTimeout(islandTimer);
+    islandTimer = setTimeout(()=>i.classList.remove('wide'), 2600);
+}
+
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+
+function setTask(n){
+    G.task = n;
+    updateTaskCard();
+}
+function updateTaskCard(){
+    const el = document.getElementById('taskText');
+    const card = document.getElementById('taskCard');
+    if(el) el.textContent = TASKS[G.task] || '';
+    if(card){
+        if(G.task >= 9){
+            card.style.display = 'none';
+        }else{
+            card.style.display = 'flex';
+        }
+    }
+}
+function need(n){
+    if(G.task !== n){
+        toast('当前任务：' + (TASKS[G.task] || ''));
+        return true;
+    }
+    return false;
+}
+
+/* =========================================================
+   五、渲染主屏
+========================================================= */
+function renderCalendar(){
+    const now = new Date();
+    const weekDays = ['周日','周一','周二','周三','周四','周五','周六'];
+    const wd = weekDays[now.getDay()];
+    const day = now.getDate();
+    const el = document.getElementById('calendarIcon');
+    if(el){
+        el.innerHTML = `
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:#fff;border-radius:14px;overflow:hidden;">
+                <div style="background:#ff3b30;color:#fff;width:100%;height:22px;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:600;">${wd}</div>
+                <div style="color:#000;font-size:28px;font-weight:400;flex-grow:1;display:flex;align-items:center;justify-content:center;padding-bottom:2px;">${day}</div>
+            </div>`;
+    }
+}
+
+/* =========================================================
+   六、App 视图
+========================================================= */
+function openApp(app){
+    if(app === 'vv' && G.task < 4){
+        toast('当前任务：' + TASKS[G.task]);
+        return;
+    }
+    if(app === 'bluebao'){
+        toast('蓝宝暂时没有新消息。');
+        return;
+    }
+
+    G.layer = 'app';
+    G.app = app;
+    document.getElementById('homeLayer').classList.add('hidden');
+    const view = document.getElementById('appView');
+    view.setAttribute('data-app', app);
+    view.classList.add('show');
+
+    if(app === 'browser'){ G.browserTab = G.browserTab || 'home'; renderBrowser(); }
+    if(app === 'vv'){ G.vvTab = 'chat'; G.vvChat = null; G.vvContact = null; G.vvInGroup = false; renderVV(); }
+}
+
+function closeApp(){
+    G.layer = 'home';
+    G.app = null;
+    document.getElementById('appView').classList.remove('show');
+    document.getElementById('homeLayer').classList.remove('hidden');
+    updateTaskCard();
+}
+
+/* ---------- 浏览器 ---------- */
+const BROWSER_NAV = [
+    ['home','社团介绍'],
+    ['board','委托板'],
+    ['case','案件档案'],
+    ['members','社员名单'],
+    ['guest','留言板'],
+];
+
+function renderBrowser(){
+    document.getElementById('appTitle').textContent = '青晟中学侦探部';
+    document.getElementById('appAction').textContent = '⟳';
+
+    const nav = BROWSER_NAV.map(([k,t])=>
+        `<button class="${G.browserTab===k?'on':''}" data-act="browserTab" data-tab="${k}">${t}</button>`
+    ).join('');
+
+    let body = '';
+    if(G.browserTab === 'home')       body = pageHome();
+    else if(G.browserTab === 'board') body = pageBoard();
+    else if(G.browserTab === 'case')  body = pageCase();
+    else if(G.browserTab === 'members') body = pageMembers();
+    else if(G.browserTab === 'guest') body = pageGuest();
+
+    document.getElementById('appBody').innerHTML =
+        `<div class="site-nav">${nav}</div>
+         <div class="site-body">${body}</div>`;
+}
+
+function pageHome(){
+    let h = '<h1>青晟中学侦探部</h1>';
+    h += '<p class="sm">老教学楼 601 ｜ 免费接受一切委托</p><hr>';
+    h += '<p>本站由施御杉搭建，还在施工中。</p>';
+    h += '<p>手机端显示可能不太好，凑合看。</p>';
+    h += '<p class="sm">社团现有成员 2 人。欢迎加入。</p>';
+    if(G.task >= 9){
+        h += '<hr><p class="sm">社团现有成员 3 人。601 已安装空调。</p>';
+    }
+    return h;
+}
+
+function pageBoard(){
+    let h = '<h2>委托板</h2><p class="sm">共 1 条委托 · 免费 · 可匿名</p>';
+    const clickable = G.task === 1;
+    h += `<div class="post" ${clickable?'data-act="openGuess" style="cursor:pointer"':''}>`;
+    h += '<div class="post-head">';
+    h += avHTML('ai',46);
+    h += '<div><div class="post-title">男朋友好像出轨了可以调查吗？</div>';
+    h += '<div class="post-meta">匿名 · 09-02 08:14</div></div>';
+    h += '</div>';
+    h += '<div class="post-body">有些人真的不知道分寸。<br>今天也没回我消息。</div>';
+    if(G.task >= 2){
+        h += '<div class="reply"><b>施御杉（社长）</b>：可以的，请放学到老教学楼601详谈。<span class="t">08:20</span></div>';
+        h += '<div class="reply"><b>匿名</b>：601，老教学楼可没有电梯吧。<span class="t">08:20</span></div>';
+    }
+    h += '</div>';
+
+    if(G.task === 1){
+        h += '<p class="sm">（点击委托帖，推测委托人的特征。）</p>';
+    }
+    if(G.task === 2){
+        h += '<button class="btn primary" data-act="goAct1">放学了 → 去老教学楼601</button>';
+    }
+    return h;
+}
+
+function pageCase(){
+    if(G.task < 2){
+        return '<h2>案件档案</h2><p class="sm">暂无档案。</p>';
+    }
+    let h = '<h2>案件档案 #001</h2>';
+    h += '<p class="sm">委托时间 09-02 08:14 ｜ 委托人：艾梦（高一一班）｜ 状态：' + (G.task >= 9 ? '已结案' : '调查中') + '</p><hr>';
+    h += '<h3>案情摘要</h3>';
+    h += '<p>艾梦怀疑其男友蒙欢（高一二班）与同班一名双马尾女生关系暧昧。</p>';
+
+    if(G.task === 3){
+        h += '<h3>待办</h3>';
+        h += '<p>① 向艾梦提问，了解委托细节。</p>';
+        h += '<div style="margin-top:14px"><button class="btn primary" data-act="askPanel">向艾梦提问</button></div>';
+    }
+
+    if(G.task === 4 || G.task === 5){
+        h += '<h3>待办</h3>';
+        h += '<p>① 确认「双马尾」是谁。</p>';
+        h += '<p class="sm">提示：香蕉园群里有座位表。艾梦说，她扎着双马尾，坐在靠走廊那边。</p>';
+    }
+
+    if(G.task === 6){
+        h += '<h3>确认结果</h3>';
+        h += '<p>靠走廊那列的双马尾女生 → <b>戴梓挚</b>。</p>';
+        h += '<div style="margin-top:14px"><button class="btn primary" data-act="goAct2">去问问戴梓挚</button></div>';
+    }
+
+    if(G.task === 7){
+        h += '<h3>确认结果</h3>';
+        h += '<p>靠走廊那列的双马尾女生 → <b>戴梓挚</b>。</p>';
+        h += '<h3>下一步</h3>';
+        h += '<p class="sm">戴梓挚说她对蒙欢没兴趣。<br>艾梦又发来了几张手机截图。</p>';
+        h += '<p class="sm">去 VV 里查看艾梦发来的截图。</p>';
+    }
+
+    if(G.task === 8){
+        h += '<hr><h3>提交结论</h3>';
+        h += '<p class="sm">线索已足够。请选择你的最终判断。</p>';
+        h += reportButtons();
+    }
+
+    if(G.task >= 9){
+        h += '<hr><h3>结案报告</h3>';
+        h += '<div class="reply"><b>结论</b><br>' + (G.playerEnding ? G.playerEnding.text : '') + '</div>';
+        h += '<hr><h3>已解锁结局</h3>';
+        h += '<p class="sm">' +
+             (G.endings.A ? '✅ 坏结局：好像确实是出轨了' : '⬜ 坏结局：好像确实是出轨了') + '<br>' +
+             (G.endings.B ? '✅ 真结局：没有出轨' : '⬜ 真结局：没有出轨') +
+             '</p>';
+        h += '<div style="margin-top:12px">' +
+             '<button class="btn primary" data-act="reopenReport">↩ 重新选择结论</button>' +
+             '<button class="btn" data-act="invoice">空调安装单（扫码）</button>' +
+             '</div>';
+    }
+    return h;
+}
+
+function reportButtons(){
+    const e = G.endings;
+    let h = '';
+    h += `<button class="btn wide${e.A?' done':''}" data-act="answer" data-v="A">${e.A?'✓ ':''}A. 好像确实是出轨了。</button>`;
+    h += `<button class="btn wide${e.B?' done':''}" data-act="answer" data-v="B">${e.B?'✓ ':''}B. 没有出轨，只是爱搭讪而已。</button>`;
+    return h;
+}
+
+function pageMembers(){
+    const list = [
+        ['shi','施御杉','社长 · 高一二班','技术、取证、以及不说话。'],
+        ['li','李真柯','社员 · 高一二班','负责跑腿。'],
+    ];
+    if(G.task >= 9) list.push(['meng','蒙欢','社员 · 高一二班','负责空调。']);
+    let h = '<h2>社员名单</h2>';
+    list.forEach(([k,n,r,d])=>{
+        h += '<div class="reply" style="display:flex;gap:10px;align-items:flex-start">' +
+             avHTML(k,36) +
+             '<div><b>'+n+'</b> <span class="sm">'+r+'</span><br><span class="sm">'+d+'</span></div></div>';
+    });
+    h += '<p class="sm">入社申请：直接来601，或者留言。</p>';
+    return h;
+}
+
+function pageGuest(){
+    let h = '<h2>留言板</h2>';
+    h += '<div class="reply"><b>匿名</b>：这里真的有人吗？</div>';
+    h += '<div class="reply"><b>施御杉</b>：有。</div>';
+    h += '<div class="reply"><b>匿名</b>：楼上好冷。</div>';
+    if(G.task >= 9){
+        h += '<hr>';
+        h += '<div class="reply"><b>匿名</b>：希望下一次，大家都能好好说话。</div>';
+        h += '<div class="reply"><b>施御杉</b>：嗯。</div>';
+        h += '<div class="reply"><b>蒙欢</b>：空调明天到。</div>';
+    }
+    return h;
+}
+
+/* ---------- VV ---------- */
+function renderVV(){
+    document.getElementById('appTitle').textContent = 'VV';
+    document.getElementById('appAction').textContent = '';
+
+    if(G.vvInGroup && G.vvChat === 'banana'){ renderGroupMembers(); return; }
+    if(G.vvTab === 'chat' && G.vvChat){ renderChatView(); return; }
+    if(G.vvTab === 'contact' && G.vvContact){ renderContactDetail(); return; }
+    if(G.vvTab === 'contact'){ renderContacts(); return; }
+    if(G.vvTab === 'search'){ renderSearch(); return; }
+    renderChatList();
+}
+
+function vvTabsHTML(){
+    const t = G.vvTab;
+    return `<div class="vv-tabs">
+        <div class="tb${t==='chat'?' on':''}" data-act="vvTab" data-t="chat"><span class="ti">💬</span>聊天</div>
+        <div class="tb${t==='contact'?' on':''}" data-act="vvTab" data-t="contact"><span class="ti">👥</span>通讯录</div>
+        <div class="tb${t==='search'?' on':''}" data-act="vvTab" data-t="search"><span class="ti">🔍</span>搜索</div>
+    </div>`;
+}
+
+function renderChatList(){
+    const order = ['banana','ai','shi'];
+    let list = '';
+    let any = false;
+    order.forEach(k=>{
+        if(!G.unlockedChats[k]) return;
+        const c = CHATS[k];
+        if(!c) return;
+        any = true;
+        const last = c.msgs.length ? (c.msgs[c.msgs.length-1].text || '[图片]') : '';
+        const time = c.msgs.length ? c.msgs[c.msgs.length-1].time : '';
+        list += `<div class="chat-item" data-act="openChat" data-c="${k}">
+            ${avHTML(c.av,46,c.type==='group')}
+            <div class="meta">
+                <div class="nm">${c.name}${c.type==='group'?' <span class="sm">('+c.sub+')</span>':''}</div>
+                <div class="pv">${last}</div>
+            </div>
+            <div class="rt">${time}</div>
+        </div>`;
+    });
+    if(!any) list = '<div class="empty">还没有聊天</div>';
+
+    document.getElementById('appBody').innerHTML =
+        `<div class="vv-wrap"><div class="vv-list">${list}</div>${vvTabsHTML()}</div>`;
+}
+
+function renderChatView(){
+    const c = CHATS[G.vvChat];
+    if(!c){ renderChatList(); return; }
+    const isGroup = c.type === 'group';
+
+    document.getElementById('appTitle').textContent = c.name;
+    document.getElementById('appAction').innerHTML = isGroup
+        ? '<span data-act="groupMembers" data-c="'+G.vvChat+'">⋯</span>'
+        : '⋯';
+
+    let msgs = '';
+    c.msgs.forEach(m=>{
+        if(m.type === 'img'){
+            const clickable = (m.img === 'seatmap' && (G.task === 4 || G.task === 5)) ||
+                              (m.img === 'aimeng_shot' && G.task === 7);
+            msgs += `<div class="msg ${m.who==='li'?'me':''}">
+                ${avHTML(m.who,36)}
+                <div class="body">
+                    ${isGroup && m.who!=='li' ? '<div class="who">'+nameOf(m.who)+'</div>' : ''}
+                    <div class="msg-img" ${clickable?'data-act="openImg" data-id="'+m.img+'"':'style="opacity:.75"'}>
+                        ${imgSlotInner(m.img)}
+                        <div class="cap">${m.cap}</div>
+                    </div>
+                </div>
+            </div>`;
+            return;
+        }
+        msgs += `<div class="msg ${m.who==='li'?'me':''}">
+            ${avHTML(m.who,36)}
+            <div class="body">
+                ${isGroup && m.who!=='li' ? '<div class="who">'+nameOf(m.who)+'</div>' : ''}
+                <div class="bub">${m.text}</div>
+            </div>
+        </div>`;
+    });
+
+    document.getElementById('appBody').innerHTML =
+        `<div class="vv-wrap"><div class="msgs">${msgs}</div>${vvTabsHTML()}</div>`;
+}
+
+function nameOf(who){
+    if(CONTACTS[who]) return CONTACTS[who].name;
+    const m = BANANA_MEMBERS.find(x=>x.id === who);
+    if(m) return m.name;
+    return who;
+}
+
+function renderGroupMembers(){
+    document.getElementById('appTitle').textContent = '群成员';
+
+    let list = BANANA_MEMBERS.map(m=>{
+        const c = CONTACTS[m.id];
+        const av = c ? c.av : '_';
+        const added = G.unlockedChats[m.id];
+        return `<div class="contact-item" data-act="groupMember" data-c="${m.id}">
+            ${avHTML(av,44)}
+            <div style="flex:1">
+                <div class="nm">${m.name}${m.role?'<span class="tag">'+m.role+'</span>':''}</div>
+                ${added?'<div class="cl">已添加</div>':''}
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('appBody').innerHTML =
+        `<div class="vv-wrap" style="padding-bottom:0">
+            <div style="background:#fff;flex:1">${list}</div>
+        </div>`;
+}
+
+function renderContacts(){
+    document.getElementById('appTitle').textContent = '通讯录';
+
+    let h = '<div style="flex:1;background:#f2f2f7">';
+    h += '<div class="cg-title">群聊</div>';
+    h += `<div class="contact-item" data-act="openChat" data-c="banana">
+        ${avHTML('jiao',44,true)}
+        <div style="flex:1"><div class="nm">香蕉园</div><div class="cl">高一二班 · 43人</div></div>
+    </div>`;
+    h += '<div class="cg-title">联系人</div>';
+    ['ai','shi','li','jiao'].forEach(k=>{
+        const c = CONTACTS[k];
+        if(!c) return;
+        const added = G.unlockedChats[k];
+        h += `<div class="contact-item" data-act="openContact" data-c="${k}">
+            ${avHTML(c.av,44)}
+            <div style="flex:1">
+                <div class="nm">${c.name}${c.tag?'<span class="tag">'+c.tag+'</span>':''}</div>
+                <div class="cl">${c.cls}${added?'':' · 未添加'}</div>
+            </div>
+        </div>`;
+    });
+    h += '</div>';
+
+    document.getElementById('appBody').innerHTML =
+        `<div class="vv-wrap"><div style="flex:1">${h}</div>${vvTabsHTML()}</div>`;
+}
+
+function renderContactDetail(){
+    const c = CONTACTS[G.vvContact];
+    if(!c){ renderContacts(); return; }
+    const added = !!G.unlockedChats[G.vvContact];
+    const isSelf = !!c.self;
+
+    document.getElementById('appTitle').textContent = '联系人';
+
+    let h = '<div class="cd-wrap">';
+    h += `<div class="cd-hero">${avHTML(G.vvContact,80)}<div class="nm">${c.name}</div><div class="cl">${c.cls}</div></div>`;
+    h += '<div class="cd-actions">';
+    if(isSelf){
+        h += '<div class="sm" style="text-align:center;padding:20px 0">这是你自己。</div>';
+    }else if(added){
+        h += `<button class="btn primary" data-act="openChat" data-c="${G.vvContact}">发消息</button>`;
+    }else{
+        h += `<button class="btn primary" data-act="addContact" data-c="${G.vvContact}">添加到通讯录</button>`;
+    }
+    h += '</div>';
+
+    h += '<div class="cd-note">';
+    if(G.vvContact === 'meng') h += '高一二班 · 香蕉园群成员。同班一周，还没加过好友。';
+    else if(G.vvContact === 'ai') h += '高一一班 · 委托者。已在通讯录。';
+    else if(G.vvContact === 'jiao') h += '高一二班班主任 · 香蕉园群主。';
+    h += '</div></div>';
+
+    document.getElementById('appBody').innerHTML = h;
+}
+
+function renderSearch(){
+    document.getElementById('appTitle').textContent = '搜索';
+
+    document.getElementById('appBody').innerHTML =
+        `<div class="vv-wrap">
+            <div class="searchbar">🔍<input id="sinput" placeholder="搜索聊天记录" autocomplete="off"></div>
+            <div class="sres" id="sres"><div class="empty">试试搜索：座位 / 双马尾 / 蒙欢 / 空调</div></div>
+            ${vvTabsHTML()}
+        </div>`;
+
+    setTimeout(()=>{
+        const i = document.getElementById('sinput');
+        if(i){ i.addEventListener('input', e=>doSearch(e.target.value)); i.focus(); }
+    }, 50);
+}
+
+function doSearch(q){
+    const box = document.getElementById('sres');
+    if(!box) return;
+    q = q.trim();
+    if(!q){
+        box.innerHTML = '<div class="empty">试试搜索：座位 / 双马尾 / 蒙欢 / 空调</div>';
+        return;
+    }
+    const res = [];
+    Object.keys(CHATS).forEach(k=>{
+        if(!G.unlockedChats[k]) return;
+        const c = CHATS[k];
+        c.msgs.forEach(m=>{
+            const txt = (m.text || m.cap || '');
+            if(txt.indexOf(q) >= 0){
+                res.push({chat:k, name:c.name, txt:txt, time:m.time});
+            }
+        });
+    });
+    if(res.length === 0){
+        box.innerHTML = '<div class="empty">没有找到相关内容。</div>';
+        return;
+    }
+    box.innerHTML = res.map(r=>
+        `<div class="row" data-act="jumpChat" data-c="${r.chat}">
+            <div class="rn">${r.name}</div>
+            <div class="rt">${r.txt}</div>
+            <div class="rr">${r.time}</div>
+        </div>`
+    ).join('');
+}
+
+function imgSlotInner(id){
+    const src = IMG[id] || '';
+    if(src) return `<img src="${src}" alt="">`;
+    return `<div class="imgslot"><div class="ph">🖼<br>${id}.jpg<br><span style="font-size:10px;opacity:.7">（图片待插入）</span></div></div>`;
+}
+
+/* =========================================================
+   七、座位表
+========================================================= */
+function seatMapHTML(){
+    let h = '<div class="seatwrap">';
+    h += '<div class="collabel win">窗户</div>';
+    h += '<div class="seatrows">';
+    h += '<div class="srow"><div class="sseat podium">讲　台</div></div>';
+    SEATS.forEach(row=>{
+        h += '<div class="srow">';
+        row.forEach(n=>{
+            let cls = 'sseat';
+            if(n === '李真柯') cls += ' me';
+            h += `<div class="${cls}" data-act="pickSeat" data-n="${n}">${n}</div>`;
+        });
+        h += '</div>';
+    });
+    h += '</div>';
+    h += '<div class="collabel aisle">走廊</div>';
+    h += '</div>';
+    return h;
+}
+
+function openSeatmap(){
+    if(G.task < 4){
+        toast('当前任务：' + TASKS[G.task]);
+        return;
+    }
+    openModal(
+        '<h3 style="margin-top:0">座位表.jpg</h3>' +
+        '<div style="border-radius:9px;overflow:hidden;background:#e4e7ed;margin-bottom:12px">' +
+          imgSlotInner('seatmap') +
+        '</div>' +
+        '<p class="sm" style="margin-bottom:8px">图片内容转写（高一二班）：</p>' +
+        seatMapHTML() +
+        '<p class="sm">讲台在上方。第 1 列靠窗，第 5 列靠走廊。<br>' +
+        '艾梦说：那个女生扎着双马尾，坐在靠走廊那边。<br>' +
+        '<b>点击座位</b>来指认她是谁。</p>' +
+        '<div style="text-align:center;margin-top:12px">' +
+          '<button class="btn" data-act="closeModal">关闭</button>' +
+        '</div>'
+    );
+}
+
+function pickSeat(name){
+    if(G.task !== 5){
+        toast('当前任务：' + TASKS[G.task]);
+        return;
+    }
+    if(name === '戴梓挚'){
+        closeModal();
+        setTask(6);
+        if(G.layer === 'app'){ closeApp(); }
+        setTimeout(()=>{
+            openApp('browser');
+            G.browserTab = 'case';
+            renderBrowser();
+        }, 350);
+        os('双马尾……是戴梓挚。');
+        return;
+    }
+    if(name === '李真柯'){
+        toast('……那是你自己。');
+        return;
+    }
+    if(name === '郝甜甜'){
+        toast('郝甜甜不是双马尾。');
+        return;
+    }
+    if(name === '梁一凡' || name === '李斯瑟' || name === '蒙欢'){
+        toast(name + '……看起来不太像。');
+        return;
+    }
+    toast(name + '不是靠走廊那列的双马尾女生。');
+}
+
+/* =========================================================
+   八、对话系统
+========================================================= */
+function dialog(lines, onEnd){
+    G.dialogQueue = lines.slice();
+    G.dialogEnd = onEnd || null;
+    const box = document.getElementById('dialog');
+    box.classList.add('show');
+    box.onclick = dlgNext;
+    dlgNext();
+}
+function dlgNext(){
+    const box = document.getElementById('dialog');
+    if(G.dialogQueue.length === 0){
+        box.classList.remove('show');
+        box.onclick = null;
+        const cb = G.dialogEnd; G.dialogEnd = null;
+        if(cb) setTimeout(cb, 220);
+        return;
+    }
+    const l = G.dialogQueue.shift();
+    if(l.os){
+        box.innerHTML = `<div class="dlg-os">〔内心OS〕${l.os}</div><div class="dlg-tap">点击继续 ▾</div>`;
+    }else{
+        const a = AV[l.av] || AV._;
+        box.innerHTML = `<div class="dlg-row">${avHTML(l.av,42)}
+            <div class="dlg-body">
+                <div class="dlg-name" style="color:${a.fg}">${l.who}</div>
+                <div class="dlg-text">${l.text}</div>
+            </div>
+        </div><div class="dlg-tap">点击继续 ▾</div>`;
+    }
+}
+
+let osTimer;
+function os(text){
+    let d = document.getElementById('osbox');
+    if(!d){
+        d = document.createElement('div');
+        d.id = 'osbox';
+        d.style.cssText =
+            'position:absolute;left:50%;bottom:150px;transform:translate(-50%,20px);' +
+            'background:rgba(18,28,38,.94);color:#9fd3c7;padding:12px 22px;border-radius:10px;' +
+            'font-size:14px;font-style:italic;z-index:2700;opacity:0;pointer-events:none;' +
+            'transition:.32s;max-width:86%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.35);';
+        document.querySelector('.iphone-screen').appendChild(d);
+    }
+    d.textContent = '〔内心OS〕' + text;
+    d.style.opacity = '1';
+    d.style.transform = 'translate(-50%,0)';
+    clearTimeout(osTimer);
+    osTimer = setTimeout(()=>{
+        d.style.opacity = '0';
+        d.style.transform = 'translate(-50%,20px)';
+    }, 3200);
+}
+
+/* =========================================================
+   九、模态
+========================================================= */
+function openModal(html, lock){
+    G.modalLock = !!lock;
+    const m = document.getElementById('modal');
+    m.innerHTML = `<div class="modal-box">${html}</div>`;
+    m.classList.add('show');
+}
+function closeModal(){
+    G.modalLock = false;
+    document.getElementById('modal').classList.remove('show');
+}
+
+/* =========================================================
+   十、剧情
+========================================================= */
+
+/* ---------- 1. 推断委托人特征 ---------- */
+function openGuess(){
+    if(need(1)) return;
+    renderGuess();
+}
+
+function renderGuess(){
+    const g = G.guess;
+    const all = g.sex && g.name && g.status;
+    openModal(
+        '<h3 style="margin-top:0">可以推测出委托人的特征</h3>' +
+        '<p class="sm" style="margin-bottom:4px">（可多选。点击每一项查看推断。）</p>' +
+        `<div class="guess${g.sex?' on':''}" data-act="guess" data-k="sex">
+            <span class="gk">1 · 性别</span>
+            <span class="gv">${g.sex?'应该是女生…吧。':'？'}</span>
+        </div>` +
+        `<div class="guess${g.name?' on':''}" data-act="guess" data-k="name">
+            <span class="gk">2 · 姓名</span>
+            <span class="gv">${g.name?'头像是爱心，姓艾，还是名字带爱字？':'？'}</span>
+        </div>` +
+        `<div class="guess${g.status?' on':''}" data-act="guess" data-k="status">
+            <span class="gk">3 · 情感状态</span>
+            <span class="gv">${g.status?'恋爱中，恐怕离分手不远了。':'？'}</span>
+        </div>` +
+        '<div style="text-align:center;margin-top:12px">' +
+          (all
+            ? '<button class="btn primary" data-act="confirmGuess">推理完毕</button>'
+            : '<button class="btn" data-act="closeModal">再想想</button>') +
+        '</div>'
+    );
+}
+
+function doGuess(k){
+    G.guess[k] = true;
+    renderGuess();
+}
+
+function confirmGuess(){
+    closeModal();
+    setTask(2);
+    dialog([
+        {os:'性别女生，姓艾，恋爱中……'},
+        {who:'李真柯', av:'li', text:'诶…这种事也管的吗…'},
+        {who:'施御杉', av:'shi', text:'只要有任务就去做吧。'},
+        {who:'施御杉', av:'shi', text:'其实网站管理员可以看见发帖人的。前提是她在学校内发的帖子。'},
+        {os:'……所以是艾梦。'},
+        {who:'施御杉', av:'shi', text:'我已经回复她了，放学后到601来。'},
+    ], ()=>{
+        G.browserTab = 'board';
+        renderBrowser();
+        os('放学后，去老教学楼601。');
+    });
+}
+
+/* ---------- 2. 委托上门 ---------- */
+function startAct1(){
+    if(need(2)) return;
+    dialog([
+        {who:'艾梦',  av:'ai',  text:'这地方也太高了…呼…'},
+        {who:'施御杉', av:'shi', text:'终于有第三个人尝到爬六楼的滋味了。'},
+        {who:'李真柯', av:'li', text:'现在不是高兴的时候啦！'},
+        {who:'李真柯', av:'li', text:'是艾梦同学对吧？请你陈述委托内容吧。'},
+        {who:'艾梦',  av:'ai',  text:'好，事情是这样的。我和男朋友是在开学认识的，他长得很对我胃口，已经谈一周啦。'},
+        {os:'开学也才一周吧。'},
+        {who:'艾梦',  av:'ai',  text:'之前也好好的，结果昨天我去他教室的时候，撞见他和另一个女的谈笑风生！'},
+        {who:'艾梦',  av:'ai',  text:'不管我怎么问他，他都搪塞过去，气死我了！'},
+        {who:'艾梦',  av:'ai',  text:'能帮我查查吗？哦，他是一班的，叫蒙欢。'},
+        {os:'蒙欢？不是那个奇怪的找我搭讪的人吗…？'},
+        {who:'施御杉', av:'shi', text:'巧了，我们也是一班的。'},
+        {who:'艾梦',  av:'ai',  text:'那就拜托啦，不收费的对吧？'},
+        {who:'艾梦',  av:'ai',  text:'额话说，你们这里可比教室热多了啊……'},
+        {who:'李真柯', av:'li', text:'也是没办法的嘛……'},
+        {who:'施御杉', av:'shi', text:'对的，但是我们还有几个问题想问。'},
+        {who:'施御杉', av:'shi', text:'李真柯，该你出马了。'},
+        {who:'李真柯', av:'li', text:'诶？'},
+    ], ()=>{
+        setTask(3);
+        askPanel();
+    });
+}
+
+/* ---------- 3. 向艾梦提问（选项式） ---------- */
+const ASK_QA = {
+    f1: [
+        {who:'李真柯', av:'li', text:'那个……出轨对象有什么特征吗？'},
+        {who:'艾梦',  av:'ai', text:'她扎着双马尾，长得还算可爱吧。'},
+        {who:'艾梦',  av:'ai', text:'和蒙欢聊天的时候坐在位子上，脸都快贴到一起去了！'},
+    ],
+    f2: [
+        {who:'李真柯', av:'li', text:'那……蒙欢的座位在哪儿？'},
+        {who:'艾梦',  av:'ai', text:'我怎么知道！'},
+        {who:'施御杉', av:'shi', text:'周一才分好座位吧，班级群里应该有最新的座位表。'},
+    ],
+    f3: [
+        {who:'李真柯', av:'li', text:'当时的情形……能再描述一下吗？'},
+        {who:'艾梦',  av:'ai', text:'我还没到他们班级门口，就透过走廊窗户看见他们两个！'},
+    ],
+};
+
+function askPanel(){
+    const q = G.asked;
+    const all = q.f1 && q.f2 && q.f3;
+    openModal(
+        '<h3 style="margin-top:0">向艾梦提问</h3>' +
+        '<p class="sm" style="margin-bottom:6px">点击问题，听听艾梦怎么说。</p>' +
+        `<div class="qask${q.f1?' done':''}" data-act="ask" data-k="f1">
+            <div class="qi">${q.f1?'✓':'1'}</div>
+            <div>出轨对象有什么特征？</div>
+        </div>` +
+        `<div class="qask${q.f2?' done':''}" data-act="ask" data-k="f2">
+            <div class="qi">${q.f2?'✓':'2'}</div>
+            <div>蒙欢的座位在哪里？</div>
+        </div>` +
+        `<div class="qask${q.f3?' done':''}" data-act="ask" data-k="f3">
+            <div class="qi">${q.f3?'✓':'3'}</div>
+            <div>当时的情形是怎样的？</div>
+        </div>` +
+        '<div style="text-align:center;margin-top:14px">' +
+          (all
+            ? '<button class="btn primary" data-act="askDone">提问完毕</button>'
+            : '<button class="btn" style="opacity:.45;pointer-events:none">把问题都问完</button>') +
+        '</div>',
+        true
+    );
+}
+
+function askQuestion(k){
+    G.asked[k] = true;
+    closeModal();
+    dialog(ASK_QA[k], ()=>{
+        askPanel();
+    });
+}
+
+function askDone(){
+    closeModal();
+    setTask(4);
+    if(G.layer === 'app') closeApp();
+    setTimeout(()=>{
+        openApp('browser');
+        G.browserTab = 'case';
+        renderBrowser();
+    }, 300);
+    os('先去香蕉园群看看座位表吧。');
+}
+
+/* ---------- 4. 实地访查 ---------- */
+function startAct2(){
+    if(need(6)) return;
+    dialog([
+        {os:'施御杉居然让我调查，说我去比较方便。'},
+        {os:'但这个应该怎么说啦！我难道要直接问戴梓挚嘛！不太好吧！！'},
+        {who:'李真柯', av:'li', text:'那个……戴梓挚……你和蒙欢同学聊过天嘛？没有别的意思！'},
+        {who:'戴梓挚', av:'dai', text:'嗯？是聊过一小会啦，怎么啦？'},
+        {who:'戴梓挚', av:'dai', text:'啊，你难道喜欢他嘛！嗯……他确实长得还可以啦，不过不是我的菜啦。'},
+        {who:'李真柯', av:'li', text:'诶！不是不是啊！！绝对不是！！'},
+        {who:'李真柯', av:'li', text:'只是，他好像有女朋友吧，他女朋友怀疑他是不是……（小声）'},
+        {who:'蒙欢', av:'meng', text:'嗯？是不是什么？'},
+        {os:'？！！！！'},
+        {who:'蒙欢', av:'meng', text:'你说女朋友……？是不是艾梦？就那个……头发卷卷的，目测C杯的那个？'},
+        {os:'？这种东西可以目测的吗。'},
+        {who:'李真柯', av:'li', text:'嗯对……她，那个，她来侦探部让我们调查，你有没有……就，和戴梓挚聊天什么的……'},
+        {who:'戴梓挚', av:'dai', text:'诶？？她不会是怀疑蒙欢和我有一腿吧～'},
+        {who:'戴梓挚', av:'dai', text:'哈哈哈哈，那小真珂可以去告诉她～完——全没有哦！'},
+        {os:'小真珂？算了不管了，这个事就这么解决了！'},
+        {os:'戴梓挚确实不像会和他有一腿嘛。'},
+        {os:'不过艾梦应该还有更多证据吧……'},
+    ], ()=>{
+        setTask(7);
+        if(G.layer === 'app') closeApp();
+        setTimeout(()=>{
+            openApp('vv');
+            G.vvTab = 'chat';
+            G.vvChat = 'ai';
+            renderVV();
+        }, 320);
+        os('去看看艾梦发来的截图。');
+    });
+}
+
+/* ---------- 5. 查看截图 ---------- */
+function openShot(){
+    if(G.task !== 7){
+        toast('当前任务：' + TASKS[G.task]);
+        return;
+    }
+    openModal(
+        '<h3 style="margin-top:0">IMG_0921.png</h3>' +
+        '<p class="sm" style="margin-bottom:10px">艾梦翻蒙欢手机拍下的聊天列表截图。</p>' +
+        '<div style="background:#f2f2f7;border-radius:9px;padding:10px">' +
+            shotRow('A 戴梓挚','拼夕夕帮我点一下 → ok') +
+            shotRow('B 郝萌萌','蒙欢：吃了吗（无回复）') +
+            shotRow('C 艾梦','艾梦：你在哪 / 蒙欢：定位（青晟中学）/ 艾梦：为什么不马上回我 / 蒙欢：刚才上厕所呢') +
+            shotRow('E 李真柯','蒙欢：我是群聊「香蕉园」的蒙欢 / 蒙欢：你很可爱欸！ / 李真柯：啊谢谢') +
+        '</div>' +
+        '<p class="sm" style="margin-top:10px">' +
+        '他对很多女生都发过类似的话，但都没有下文。<br>' +
+        '艾梦的聊天里，全是高频查岗。' +
+        '</p>' +
+        '<div style="text-align:center;margin-top:12px">' +
+          '<button class="btn primary" data-act="afterShot">看完了</button>' +
+        '</div>'
+    );
+}
+
+function shotRow(n, t){
+    return `<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 4px;border-bottom:1px solid #e6e6ea;font-size:12.5px">
+        <b style="flex:0 0 auto">${n}</b>
+        <span style="color:#8a8a96;text-align:right">${t}</span>
+    </div>`;
+}
+
+function afterShot(){
+    if(G.task !== 7){
+        toast('当前任务：' + TASKS[G.task]);
+        return;
+    }
+    closeModal();
+    setTask(8);
+    closeApp();
+    os('那么，结论是什么？');
+}
+
+/* ---------- 6. 结论 ---------- */
+function answer(v){
+    if(need(8)) return;
+    closeModal();
+    if(v === 'A') endingA();
+    else endingB();
+}
+
+/* 坏结局：好像确实是出轨了 */
+function endingA(){
+    G.endings.A = true;
+    G.playerEnding = {
+        code:'A',
+        text:'判定蒙欢实质出轨。但证据链并不支持这一结论。'
+    };
+    setTask(9);
+    dialog([
+        {os:'……可是，所有记录里都没有暧昧。'},
+        {os:'我是不是太急着给艾梦一个答案了。'},
+        {who:'施御杉', av:'shi', text:'结论发出去了。'},
+        {who:'施御杉', av:'shi', text:'戴梓挚回了一个「？」。'},
+        {who:'施御杉', av:'shi', text:'蒙欢没说话。'},
+        {who:'艾梦', av:'ai', text:'我就知道！我这就去找他算账！'},
+    ], ()=>{
+        renderBrowser();
+        showBadEnding();
+    });
+}
+
+function showBadEnding(){
+    openModal(
+        '<h3 style="margin-top:0;color:#c0392b">坏结局</h3>' +
+        '<p class="sm" style="line-height:1.9">' +
+        '几天后，拜艾梦精心制作的瓜条所赐，<br>' +
+        '「蒙欢是个渣男」的消息在年级里传开。<br><br>' +
+        '渐渐地，蒙欢被孤立了……' +
+        '</p>' +
+        '<hr>' +
+        '<p class="sm">也许，还有别的可能。</p>' +
+        '<div style="text-align:center;margin-top:12px">' +
+          '<button class="btn primary" data-act="badBack">重新调查</button>' +
+        '</div>'
+    );
+}
+
+function badBack(){
+    closeModal();
+    G.playerEnding = null;
+    setTask(8);
+    renderBrowser();
+    os('再看一遍那些截图……');
+}
+
+/* 真结局：没有出轨
+   —— 转账画面：蒙欢在左，艾梦在右 */
+function endingB(){
+    G.endings.B = true;
+    G.playerEnding = {
+        code:'B',
+        text:'蒙欢无实质出轨行为。只是习惯性搭讪，边界感差。艾梦的信任危机导致关系破裂。双方和平分手。'
+    };
+    setTask(9);
+
+    const m = document.getElementById('modal');
+    m.innerHTML =
+        '<div class="modal-box" style="padding:0;overflow:hidden;max-width:340px">' +
+          '<div style="background:#ededf2;text-align:center;padding:11px;font-weight:600;font-size:14px;border-bottom:1px solid #dddde4">AAA老公</div>' +
+          '<div id="bk" style="background:#f2f2f7;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:320px;max-height:56vh;overflow-y:auto"></div>' +
+        '</div>';
+    G.modalLock = true;
+    m.classList.add('show');
+
+    const box = document.getElementById('bk');
+    const add = html => {
+        box.insertAdjacentHTML('beforeend', html);
+        box.scrollTop = box.scrollHeight;
+    };
+
+    (async ()=>{
+        await sleep(500);
+        add('<div class="sysline">今天 21:47</div>');
+
+        /* 蒙欢（左） */
+        await sleep(600);
+        add('<div class="msg">' + avHTML('meng',36) +
+            '<div class="body"><div class="bub">我们分手吧</div></div></div>');
+
+        /* 艾梦（右） */
+        await sleep(800);
+        add('<div class="msg me">' + avHTML('ai',36) +
+            '<div class="body"><div class="bub">？</div></div></div>');
+
+        /* 蒙欢（左）转账 */
+        await sleep(950);
+        add('<div class="msg">' + avHTML('meng',36) +
+            '<div class="body"><div class="bub transfer">［转账］¥10000.00' +
+            '<span class="sub">备注：分手费</span></div></div></div>');
+
+        await sleep(1150);
+        add('<div class="sysline red">已拒收</div>');
+        await sleep(700);
+        add('<div class="sysline" id="bk-count">十秒后……</div>');
+
+        for(let i=10; i>0; i--){
+            const el = document.getElementById('bk-count');
+            if(el) el.textContent = i + ' 秒后……';
+            await sleep(1000);
+        }
+        const el = document.getElementById('bk-count');
+        if(el) el.textContent = '……';
+
+        expandIsland();
+        showBanner('蓝宝', '到账通知：¥10000.00（来自 蒙欢）', '💙');
+        await sleep(1500);
+
+        add('<div class="sysline">蓝宝到账 ¥10000.00</div>');
+
+        /* 艾梦（右） */
+        await sleep(650);
+        add('<div class="msg me">' + avHTML('ai',36) +
+            '<div class="body"><div class="bub">我知道了</div></div></div>');
+
+        await sleep(950);
+        add('<div style="text-align:center;padding:14px 0">' +
+            '<button class="btn primary" data-act="afterBreakup">放下手机</button></div>');
+    })();
+}
+
+function afterBreakup(){
+    closeModal();
+    renderBrowser();
+    setTimeout(()=>{
+        dialog([
+            {who:'李真柯', av:'li', text:'第一件事就这么愉快地解决了呢！（扇扇子）'},
+            {who:'施御杉', av:'shi', text:'嗯，那是最好的了。'},
+            {os:'（门被猛地推开。）'},
+            {who:'蒙欢', av:'meng', text:'我可以加入你们社团吧！'},
+            {who:'李真柯', av:'li', text:'吓。嗯嗯？当然可以了！'},
+            {who:'李真柯', av:'li', text:'不过入部原因是什么呢？'},
+            {who:'蒙欢', av:'meng', text:'入部原因？那当然是因为这样的老教学楼，你们孤男寡女的。'},
+            {who:'蒙欢', av:'meng', text:'施御杉那家伙，看起来就是个闷骚好不好？'},
+            {who:'蒙欢', av:'meng', text:'要是他对……咳，对小真柯出手怎么办？'},
+            {who:'李真柯', av:'li', text:'？？？？？'},
+            {who:'施御杉', av:'shi', text:'……知道了。多一个人总归是好的。'},
+            {os:'（蒙欢坐在沙发上，看到李真柯在扇扇子。）'},
+            {who:'蒙欢', av:'meng', text:'坐下来才发现啊，你们这比别的地方热好多啊。'},
+            {who:'蒙欢', av:'meng', text:'不过……这里没人管的话，我可以自费买空调吧？'},
+            {who:'李真柯', av:'li', text:'啊？你刚刚说什么？'},
+            {who:'蒙欢', av:'meng', text:'喂？王管家？嗯，明天来这里装台空调，就那种落地式的啊。'},
+            {who:'蒙欢', av:'meng', text:'明天就装明天就装，我学校老教学楼601，嗯好挂了。'},
+            {os:'这就是有钱人的世界吗……不过有空调真是太好了呢！！'},
+        ], ()=>{
+            renderBrowser();
+            os('空调明天到。');
+        });
+    }, 320);
+}
+
+/* ---------- 彩蛋 ---------- */
+function openInvoice(){
+    openModal(
+        '<h3 style="margin-top:0">空调安装单</h3>' +
+        '<div class="reply" style="font-size:13px;line-height:1.9">' +
+          '品名：立式空调 ×1<br>' +
+          '安装地址：青晟中学 老教学楼 601<br>' +
+          '申请人：蒙欢<br>' +
+          '备注：货梯进入（老教学楼无电梯，需人工搬运）' +
+        '</div>' +
+        '<p class="sm" style="text-align:center;margin-top:14px">扫描发票二维码</p>' +
+        '<div style="width:140px;height:140px;margin:10px auto;cursor:pointer;' +
+          'background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 0 0/11px 11px;' +
+          'border:7px solid #fff;box-shadow:0 0 0 1px #ccc" data-act="qr"></div>' +
+        '<div style="text-align:center"><button class="btn" data-act="closeModal">关闭</button></div>'
+    );
+}
+function openQR(){
+    openModal(
+        '<h3 style="margin-top:0">蒙氏集团 · 采购审批系统</h3>' +
+        '<div class="reply" style="font-size:13px;line-height:2">' +
+          '单号：MS-2024-0904-017<br>' +
+          '事由：空调采购（个人自费，挂集团账）<br>' +
+          '金额：¥8,600.00<br>' +
+          '审批人：<b>蒙弛</b><br>' +
+          '备注：<b>继续观察蒙欢。</b>' +
+        '</div>' +
+        '<p class="sm" style="text-align:center;margin-top:12px">（屏幕暗了一下。）</p>' +
+        '<div style="text-align:center"><button class="btn primary" data-act="mail">继续</button></div>'
+    );
+}
+function openMail(){
+    openModal(
+        '<h3 style="margin-top:0">施御杉的后台 · 未读邮件</h3>' +
+        '<div class="reply" style="font-size:13px;line-height:2">' +
+          '发件人：M<br>' +
+          '主题：女厕所<br>' +
+          '正文：老教学楼三楼女厕所，晚上有哭声。<br>' +
+          '附件：一张模糊照片' +
+        '</div>' +
+        '<hr>' +
+        '<p class="sm">戴梓挚的朋友圈更新：<br>「新目标：侦探部全员陪我调查女厕所，小真柯保护我！」</p>' +
+        '<p class="sm">蒙欢手机通讯录里，哥哥「蒙弛」的未接来电闪烁。</p>' +
+        '<hr>' +
+        '<p style="text-align:center;font-weight:600;color:#3f5d8a">下一案：《青晟中学女厕所闹鬼事件》</p>' +
+        '<div style="text-align:center;margin-top:10px">' +
+          '<button class="btn primary" data-act="closeModal">……</button>' +
+        '</div>'
+    );
+}
+
+function reopenReport(){
+    setTask(8);
+    G.playerEnding = null;
+    renderBrowser();
+    toast('可以重新选择结论了');
+}
+
+/* =========================================================
+   十一、事件委托
+========================================================= */
+document.addEventListener('click', e=>{
+    const t = e.target.closest('[data-act]');
+    if(!t) return;
+    const a = t.dataset.act;
+
+    if(a === 'openApp'){
+        openApp(t.dataset.app);
+        return;
+    }
+    if(a === 'disabledApp'){
+        toast('这个 App 暂时用不上。');
+        return;
+    }
+    if(a === 'closeApp'){
+        closeApp();
+        return;
+    }
+
+    if(a === 'browserTab'){
+        const tab = t.dataset.tab;
+        if(tab === 'board' && G.task === 0){
+            G.browserTab = 'board';
+            setTask(1);
+            renderBrowser();
+            return;
+        }
+        G.browserTab = tab;
+        renderBrowser();
+        return;
+    }
+
+    if(a === 'openGuess'){ openGuess(); return; }
+    if(a === 'guess'){ doGuess(t.dataset.k); return; }
+    if(a === 'confirmGuess'){ confirmGuess(); return; }
+
+    if(a === 'goAct1'){ startAct1(); return; }
+    if(a === 'askPanel'){ askPanel(); return; }
+    if(a === 'ask'){ askQuestion(t.dataset.k); return; }
+    if(a === 'askDone'){ askDone(); return; }
+
+    if(a === 'goAct2'){ startAct2(); return; }
+    if(a === 'answer'){ answer(t.dataset.v); return; }
+    if(a === 'reopenReport'){ reopenReport(); return; }
+    if(a === 'badBack'){ badBack(); return; }
+    if(a === 'invoice'){ openInvoice(); return; }
+    if(a === 'qr'){ openQR(); return; }
+    if(a === 'mail'){ openMail(); return; }
+    if(a === 'afterBreakup'){ afterBreakup(); return; }
+
+    if(a === 'pickSeat'){ pickSeat(t.dataset.n); return; }
+
+    if(a === 'openImg'){ openChatImg(t.dataset.id); return; }
+    if(a === 'afterShot'){ afterShot(); return; }
+
+    if(a === 'vvTab'){
+        G.vvTab = t.dataset.t;
+        G.vvChat = null;
+        G.vvContact = null;
+        G.vvInGroup = false;
+        renderVV();
+        if(G.vvTab === 'search'){
+            setTimeout(()=>{
+                const i = document.getElementById('sinput');
+                if(i){ i.addEventListener('input', ev=>doSearch(ev.target.value)); i.focus(); }
+            }, 50);
+        }
+        return;
+    }
+
+    if(a === 'openChat'){
+        G.vvTab = 'chat';
+        G.vvChat = t.dataset.c;
+        G.vvContact = null;
+        G.vvInGroup = false;
+        renderVV();
+        return;
+    }
+
+    if(a === 'groupMembers'){
+        if(G.task < 4){
+            toast('当前任务：' + TASKS[G.task]);
+            return;
+        }
+        G.vvInGroup = true;
+        renderVV();
+        return;
+    }
+
+    if(a === 'groupMember'){
+        const id = t.dataset.c;
+        if(!CONTACTS[id]){
+            toast('这只是班里的同学，暂时不用联系。');
+            return;
+        }
+        G.vvInGroup = false;
+        G.vvTab = 'contact';
+        G.vvContact = id;
+        renderVV();
+        return;
+    }
+
+    if(a === 'openContact'){
+        G.vvTab = 'contact';
+        G.vvContact = t.dataset.c;
+        renderVV();
+        return;
+    }
+    if(a === 'addContact'){
+        addContact(t.dataset.c);
+        return;
+    }
+
+    if(a === 'jumpChat'){
+        G.vvTab = 'chat';
+        G.vvChat = t.dataset.c;
+        G.vvContact = null;
+        G.vvInGroup = false;
+        renderVV();
+        return;
+    }
+
+    if(a === 'closeModal'){ closeModal(); return; }
+});
+
+function openChatImg(id){
+    if(id === 'seatmap'){
+        if(G.task < 4){
+            toast('当前任务：' + TASKS[G.task]);
+            return;
+        }
+        if(G.task === 4) setTask(5);
+        openSeatmap();
+        return;
+    }
+    if(id === 'aimeng_shot'){
+        openShot();
+        return;
+    }
+    openModal('<h3>图片</h3><div style="border-radius:9px;overflow:hidden">'+imgSlotInner(id)+'</div>' +
+        '<div style="text-align:center;margin-top:12px"><button class="btn" data-act="closeModal">关闭</button></div>');
+}
+
+function addContact(id){
+    const c = CONTACTS[id];
+    if(!c) return;
+    openModal(
+        '<h3 style="margin-top:0">添加到通讯录</h3>' +
+        '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 16px">' +
+          avHTML(id,54) +
+          '<div><b>'+c.name+'</b><br><span class="sm">'+c.cls+'</span></div>' +
+        '</div>' +
+        '<p class="sm">发送好友申请？</p>' +
+        '<div style="text-align:center;margin-top:14px">' +
+          '<button class="btn primary" data-act="doAdd" data-c="'+id+'">发送</button>' +
+          '<button class="btn" data-act="closeModal">取消</button>' +
+        '</div>'
+    );
+}
+
+async function doAdd(id){
+    closeModal();
+    openModal('<h3 style="margin-top:0">已发送好友申请</h3><p class="sm">等待对方通过……</p>');
+    await sleep(1200);
+    closeModal();
+    G.unlockedChats[id] = true;
+    expandIsland();
+    showBanner('VV', CONTACTS[id].name + ' 已通过你的好友申请', '💬');
+    renderVV();
+}
+
+document.getElementById('modal').addEventListener('click', e=>{
+    if(e.target.id === 'modal' && G.task < 9 && !G.modalLock) closeModal();
+});
+
+/* =========================================================
+   十二、启动
+========================================================= */
+renderCalendar();
+updateTaskCard();
+setTimeout(()=>{ os('诶，这种事也管的吗。'); }, 900);
+</script>
+</body>
+</html>
